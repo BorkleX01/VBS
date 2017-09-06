@@ -1,0 +1,28 @@
+<h1>Pick Up</h1>
+<div *ngIf="simpleBookingsService.pickUpBookingSuccess == true">
+	<div class="label">Booking Successfully Confirmed!</div>
+	<br/>
+	<div class="form-line">
+		<div class="label">Reference:</div>
+		<div class="value">{{simpleBookingsService.responseObj.BookingReference}}</div>
+	</div>
+	<div class="form-line">
+		<div class="label">Empty Release Number:</div>
+		<div class="value">{{simpleBookingsService.responseObj.FacilityReference}}</div>
+	</div>
+	<div class="form-line">
+		<div class="label">Date</div>
+		<div class="value">{{simpleBookingsService.responseObj.BookingDate}}</div>
+		<div class="label">Zone</div>
+		<div class="value">{{simpleBookingsService.responseObj.BookingZone}}</div>
+	</div>
+	<div class="form-line">
+		<div class="label">Location</div>
+		<div class="value">{{simpleBookingsService.responseObj.FacilityId}}</div>
+	</div>
+	
+</div>
+
+<div *ngIf="simpleBookingsService.pickUpBookingSuccess == false">
+	No Data.
+</div>

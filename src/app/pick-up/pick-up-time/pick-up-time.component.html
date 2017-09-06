@@ -1,0 +1,61 @@
+<h1>Pick Up</h1>
+
+<div class="form-line">
+	<div class="form-label">
+		<label>Date:</label>
+	</div>
+	<div class="form-input">
+		<p-calendar dateFormat="yy-mm-dd" [(ngModel)]="date" (onSelect)="captureDate($event)"></p-calendar>
+	</div>
+	
+</div>
+
+
+<div class="form-line">
+	<div class="form-label">
+		<label>Zone:</label>
+	</div>
+	<div *ngIf="relevantTimeZoneAvailable" class="form-input">
+		<p-dropdown [options]="zones" [(ngModel)]="selectedZone" editable="editable" [style]="{'width':'200px'}" (onChange)="captureZone($event)"></p-dropdown>
+	</div>
+	
+	<div *ngIf="!relevantTimeZoneAvailable" class="form-input" [innerHTML]="preTimeslotRequestMSG">
+  </div>
+</div>
+
+<div class="form-line">
+	<div class="form-label">
+		<label>Truck:</label>
+	</div>
+	<div class="form-input">
+		<input type="text" pInputText [(ngModel)]="truckRego" (blur)="captureRego()">
+	</div>
+</div>
+
+<div class="form-line">
+	<div class="form-label">
+		<label>Driver:</label>
+	</div>
+	<div class="form-input">
+		<input type="text" pInputText [(ngModel)]="truckDriver" (blur)="captureDriverName()">
+	</div>
+</div>
+
+<div class="form-line">
+    <div class="form-label">
+      <label>Trailer Rego:</label>
+    </div>
+    <div class="form-input">
+      <input type="text" pInputText [(ngModel)]="trailerRego" (blur)="captureTrailerRego()">
+    </div>
+</div>
+
+
+<div class="form-line">
+  <div class="form-label">
+    <label>License No.:</label>
+  </div>
+    <div class="form-input">
+      <input type="text" pInputText [(ngModel)]="licenseNumber" (blur)="captureLicenseNumber()">
+    </div>
+</div>

@@ -1,0 +1,26 @@
+/*.ui-accordion-content > li{
+	margin-bottom: 5px; 
+}
+
+.app-container-body {
+	min-height: 920px;
+}*/
+
+.topbar-left{
+	padding-top: 8px !important;
+}
+
+.profile-name{
+	margin-top: 9px;
+	color: white !important;
+}
+
+@media (max-width: 1025px) {
+	.profile-name-show{
+		display: none;
+	}
+}
+
+.dialogue-msg {
+    font-size: small;
+}

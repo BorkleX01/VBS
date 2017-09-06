@@ -1,0 +1,28 @@
+<h1>Pick Up</h1>
+
+<div class="form-line">
+	<div class="form-label">
+		<label>Empty Release #:</label>
+	</div>
+	<div class="form-input">
+		<input type="text" pInputText [(ngModel)]="ERN" (blur)="captureERN()">
+	</div>
+</div>
+
+<div class="form-line">
+	<div class="form-label">
+		<label>Location:</label>
+	</div>
+	<div class="form-input">
+		<input type="text" pInputText [(ngModel)]="location" (blur)="captureLocation()">
+	</div>
+</div>
+
+<div class="form-line">
+	<div class="form-label">
+		<label>Shipping Line</label>
+	</div>
+	<div class="form-input">
+		<input type="text" pInputText >
+	</div>
+</div>

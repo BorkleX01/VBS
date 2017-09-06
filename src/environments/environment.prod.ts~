@@ -1,0 +1,7 @@
+export const environment = {
+    production: true,
+    apiBaseUrl: 'https://vbs41-dev.1-stop.biz/',
+    authUrl: 'https://api-40.1-stop.biz/',
+    name: 'prod'
+};
+

@@ -1,0 +1,223 @@
+import { Component, OnInit, ViewChild , AfterViewInit} from '@angular/core';
+import { Http, Response } from '@angular/http';
+import { Router } from '@angular/router';
+import { NgClass } from '@angular/common';
+import { CarouselModule, SelectItem } from 'primeng/primeng';
+import { Applog } from '../applog';
+import { SimpleBookingsService } from './simple-bookings.service';
+
+import { TokenRequest } from '../shared/token-request';
+import { RequestHeader } from '../shared/request-header';
+
+import { TokenRefresher } from '../shared/token-refresher';
+
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/toPromise';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/operator/distinctUntilChanged';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/switchMap';
+
+
+@Component({
+    selector: 'app-simple-bookings',
+    templateUrl: './simple-bookings.component.html',
+    styleUrls: ['./simple-bookings.component.css'],
+
+})
+
+export class SimpleBookingsComponent implements AfterViewInit {
+
+    @ViewChild('carousel01')
+    private carousel:CarouselModule ;
+    
+    bookingSuccess:boolean = false;
+    bookingError: any;
+    facilityRetrievalSuccess: any = false;
+    facilityRetrievalError: any;
+
+    private sites:SelectItem[];
+    private selectedSite: string = '';
+
+    private pickUpBookingSuccess = false;
+
+    private requestHeader: RequestHeader;
+    
+    constructor(private http: Http, private applog: Applog, private router: Router, private simpleBookingsService:SimpleBookingsService, private tokenRefresher: TokenRefresher) {
+	console.log("sbs component cons");
+	this.sites = [];
+
+	this.simpleBookingsService.retrieveFacilities().then((res)=>{
+	    console.log(res);
+	    if (this.simpleBookingsService.interpretResponse(res)["Status"] == false){
+		console.log("service failure");
+		this.facilityRetrievalSuccess = false;
+		this.facilityRetrievalError = this.simpleBookingsService.interpretResponse(res).Description;
+		console.log(this.facilityRetrievalError);
+	    }else {
+		this.facilityRetrievalSuccess = true;
+		var facilityList = this.simpleBookingsService.interpretResponse(res).Data;
+		for (var i=0; i < facilityList.length; i++)
+		{
+		    console.log(facilityList[i].Name);
+		    console.log(facilityList[i].SiteURL);
+		    this.sites.push({label: facilityList[i].Name, value:facilityList[i].SiteURL});
+		}
+	    }
+	}).catch((errObj: any) => {
+	    console.log("rxjs failure");
+	    this.bookingSuccess = false;
+	    this.applog.headerTitle = "Error";
+	    this.applog.stdLog = "Error: " + this.simpleBookingsService.interpretResponse(errObj).Description + ".\nPlease try again";
+	    if (this.simpleBookingsService.interpretResponse(errObj).Description == "Unauthorized")
+	    {
+		//this.simpleBookingsService.refreshCredentials();
+		//this.simpleBookingsService.logout()
+		this.simpleBookingsService.refreshCredentials();
+	    }
+	    this.applog.allowDismissal = true;
+	    console.log(errObj);
+	})
+	
+    }
+
+    sequenceData: any = [
+	{key:"entry"},
+	{key:"choose movement"}
+
+    ];
+
+    deeplinkTo(){
+	console.log("navigate to: " + this.selectedSite);
+	window.location.href = this.selectedSite;
+    }
+
+    vbsAction = function(seq){
+	this.simpleBookingsService.allowConfirmation = false;
+	this.sequenceData = [
+	    {key:"entry"},
+	    {key:"choose movement"}
+	];
+	this.carousel.setPage(0);
+    };
+
+    vbsDropOff = function(seq){
+	this.simpleBookingsService.allowConfirmation = false;
+	this.sequenceData = [
+	    {key:"dropoff-1"},
+	    {key:"dropoff-2"},
+	    {key:"dropoff-3"}
+	]
+	this.carousel.setPage(0);
+	this.simpleBookingsService.createNewBooking("EXPORT");
+	this.simpleBookingsService.editBooking("SlotType", "EXPORT");
+	
+    }
+
+    vbsPickUp = function(seq){
+	this.sequenceData = [
+	    {key:"pickup-1"},
+	    {key:"pickup-2"},
+	    {key:"pickup-3"}
+	]
+	this.carousel.setPage(0);
+	this.simpleBookingsService.createNewBooking("IMPORT");
+	this.simpleBookingsService.editBooking("SlotType", "IMPORT");
+	this.simpleBookingsService.editBooking("CargoId", null);
+    }
+
+    vbsConfirmDropOff = function(seq){
+	console.log("confirm booking");
+
+	
+	this.finaliseAndPost();
+	this.carousel.onNextNav();
+    }
+
+    vbsConfirmPickUp = function(seq){
+	console.log("confirm booking");
+	console.log(this.simpleBookingsService.getBooking());
+	this.finaliseAndPost();
+	this.carousel.onNextNav();
+    }
+
+    finaliseAndPost = function(){
+	console.log(this.simpleBookingsService.bookingEndPoint);
+	console.log(JSON.stringify(this.simpleBookingsService.getBooking()));
+	console.log(this.simpleBookingsService.requestHeader.options);
+
+	this.simpleBookingsService.responseObj = {};
+	this.simpleBookingsService.dropOffBookingSuccess = false;
+	this.simpleBookingsService.pickUpBookingSuccess = false;
+	this.applog.headerTitle = "Sending Request";
+	this.applog.showProgress("Confirming booking...");
+	var url = this.simpleBookingsService.bookingEndPoint;
+	var body = JSON.stringify(this.simpleBookingsService.getBooking());
+	var headers = this.simpleBookingsService.requestHeader.options;
+	
+	this.simpleBookingsService.transmitRequest(url, body, headers).then((res) => {
+	    this.simpleBookingsService.responseObj = {};
+	    this.applog.closeNotification();
+	    console.log(res);
+	    this.simpleBookingsService.responseObj = res;
+	    if (this.simpleBookingsService.interpretResponse(res)["Status"] == false){
+		console.log("service failure");
+		if (this.simpleBookingsService.getBooking().SlotType == "EXPORT")
+		{
+		    console.log("Drop-off failure");
+		    this.simpleBookingsService.dropOffBookingSuccess = false;
+		}
+		if (this.simpleBookingsService.getBooking().SlotType == "IMPORT")
+		{
+		    console.log("Pick-up failure");
+		    this.simpleBookingsService.pickUpBookingSuccess = false;
+		}
+		console.log(this.simpleBookingsService.interpretResponse(res).Description);
+		this.bookingSuccess = false;
+		this.bookingError = this.simpleBookingsService.interpretResponse(res).Description;
+		
+	    }else{
+		console.log("service success");
+		this.applog.closeNotification();
+		this.bookingSuccess = true;
+		var bookingConfirmation = this.simpleBookingsService.interpretResponse(res).Data;
+		this.simpleBookingsService.responseObj = bookingConfirmation;
+		if (this.simpleBookingsService.getBooking().SlotType == "EXPORT")
+		{
+		    console.log("Drop-off success");
+		    this.simpleBookingsService.dropOffBookingSuccess = true;
+		}
+		if (this.simpleBookingsService.getBooking().SlotType == "IMPORT")
+		{
+		    console.log("Pick-up success");
+		    this.simpleBookingsService.pickUpBookingSuccess = true;
+		}
+	    }
+	}).catch((errObj: any)=>{
+	    console.log("rxjs failure");
+	    this.bookingSuccess = false;
+	    this.applog.headerTitle = "Error";
+	    this.applog.stdLog = "Error: " + this.simpleBookingsService.interpretResponse(errObj).Description + ".\nPlease try again";
+	    if (this.simpleBookingsService.interpretResponse(errObj).Description == "Unauthorized")
+	    {
+		this.simpleBookingsService.refreshCredentials();
+		//this.simpleBookingsService.logout()
+	    }
+	    this.applog.allowDismissal = true;
+	    console.log(errObj);
+        })
+    }
+    
+    ngOnInit() {
+	console.log("Refresh Token on sbs component init "+ TokenRequest.refreshToken);
+	console.log("Header");
+	console.log(this.simpleBookingsService.requestHeader.options);
+
+    }
+
+    ngAfterViewInit() {
+	//console.log(this.carousel);
+    }
+
+}

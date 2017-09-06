@@ -1,0 +1,79 @@
+
+<h1>VBS BOOKING PORTAL</h1>
+<p><button pButton type="text" label="Start Again" (click)="vbsAction(seq)"></button></p>
+<p-carousel numVisible="1" [value]="sequenceData" breakpoint="800" effectDuration='0.3s' #carousel01>
+	
+	<template let-seq>
+		<div *ngIf="seq.key == 'entry'">
+			<div class="form-line">
+				<p> Please select a facility to manage bookings at that terminal: </p>
+			</div>
+			<div class="form-line card">
+				<div class="form-label">
+					<label><img src="assets/images/u29.png" width="150px"/></label>
+				</div>
+				<div class="form-input">
+					<p-dropdown *ngIf="facilityRetrievalSuccess" [options]="sites" [(ngModel)]="selectedSite" [style]="{'width':'200px'}" editable="editable" (onChange)="deeplinkTo()"></p-dropdown>
+				</div>
+			</div>
+			<div class="form-line">
+				<p>Select Container Park Bookings if you need to return or pick up a container from one of the parks running VBS.</p>
+			</div>
+			<div class="form-line card">
+				<div class="form-label">
+					<img src="assets/images/u19.png" width="150px"/> 
+				</div>
+				<div class="form-input">
+					<button pButton type="text" label="Container Park Bookings" (click)="carousel01.onNextNav()"></button>
+				</div>
+			</div>
+		</div>
+
+		<div *ngIf="seq.key == 'choose movement'" class="card">
+			<p>Please select a booking type</p>
+			<button pButton type="text" label="Drop Off" (click)="vbsDropOff(seq)"></button>
+			<button pButton type="text" label="Pick Up" (click)="vbsPickUp(seq)"></button>
+			<p>View or edit your existing Container park bookings</p>
+			<button pButton type="text" label="View My Bookings" (click)="vbsAction(seq)"></button>
+		</div>
+
+
+
+		
+		<div *ngIf="seq.key == 'dropoff-1'" class="card">
+			<app-drop-off-container></app-drop-off-container>
+			<button pButton type="text" label="Next" (click)="carousel01.onNextNav()"></button>
+		</div>
+		<div *ngIf="seq.key == 'dropoff-2'" class="card">
+			<app-drop-off-time></app-drop-off-time>
+			<button pButton type="text" label="Back" (click)="carousel01.onPrevNav()"></button>
+			<button *ngIf="simpleBookingsService.allowConfirmation" pButton type="text" label="Confirm" (click)="vbsConfirmDropOff()"></button>
+		</div>
+		<div *ngIf="seq.key == 'dropoff-3'" class="card">
+			<app-drop-off-confirmation *ngIf="bookingSuccess"></app-drop-off-confirmation>
+			<div *ngIf="!bookingSuccess" [innerHTML]="bookingError"></div>
+			<p><button pButton type="text" label="Keep Booking" (click)="carousel01.setPage(0)"></button>
+				<button pButton type="text" label="View My Bookings" (click)="vbsAction(seq)"></button></p>
+		</div>
+
+		
+		<div *ngIf="seq.key == 'pickup-1'" class="card">
+			<app-pick-up-release-no></app-pick-up-release-no>
+			<button pButton type="text" label="Next" (click)="carousel01.onNextNav()"></button>
+		</div>
+		<div *ngIf="seq.key == 'pickup-2'" class="card">
+			<app-pick-up-time></app-pick-up-time>
+			<button pButton type="text" label="Back" (click)="carousel01.onPrevNav()"></button>
+			<button *ngIf="simpleBookingsService.allowConfirmation" pButton type="text" label="Confirm" (click)="vbsConfirmPickUp()"></button>
+		</div>
+		<div *ngIf="seq.key == 'pickup-3'" class="card">
+			<app-pick-up-confirmation *ngIf="bookingSuccess"></app-pick-up-confirmation>
+			<div *ngIf="!bookingSuccess" [innerHTML]="bookingError"></div>
+			<p><button pButton type="text" label="Keep Booking" (click)="carousel01.setPage(0)"></button>
+				<button pButton type="text" label="View My Bookings" (click)="vbsAction(seq)"></button></p>
+		</div>
+
+		
+	</template>
+</p-carousel>
+

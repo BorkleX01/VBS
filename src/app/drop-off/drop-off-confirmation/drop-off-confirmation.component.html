@@ -1,0 +1,29 @@
+<h1>Drop Off</h1>
+<div *ngIf="simpleBookingsService.dropOffBookingSuccess == true">
+	<div class="label">Booking Successfully Confirmed!</div>
+	<br/>
+	<div class="form-line">
+		<div class="label">Reference:</div>
+		<div class="value">{{simpleBookingsService.responseObj.BookingReference}}</div>
+	</div>
+	<div class="form-line">
+		<div class="label">Container Number:</div>
+		<div class="value">{{simpleBookingsService.responseObj.CargoId}}</div>
+	</div>
+	<div class="form-line">
+		<div class="label">Date:</div>
+		<div class="value">{{simpleBookingsService.responseObj.BookingDate}}</div>
+		<div class="label">Zone:</div>
+		<div class="value">{{simpleBookingsService.responseObj.BookingZone}}</div>
+	</div>
+	<div class="form-line">
+		<div class="label">Location:</div>
+		<div class="value">{{simpleBookingsService.responseObj.FacilityId}}</div>
+	</div>
+
+	
+</div>
+
+<div *ngIf="simpleBookingsService.dropOffBookingSuccess == false">
+	No Data.
+</div>

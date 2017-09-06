@@ -1,0 +1,12 @@
+.form-line{
+    padding-bottom: 15px;
+}
+input {
+    width:200px
+}
+
+.form-label {
+    float: left;
+    width: 130px;
+    
+}

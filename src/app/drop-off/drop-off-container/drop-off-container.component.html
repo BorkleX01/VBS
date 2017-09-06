@@ -1,0 +1,40 @@
+<h1>Drop Off</h1>
+
+	<div class="form-line">
+		<div class="form-label">
+			<label>Container Number:</label>
+		</div>
+		<div class="form-input">
+			<input type="text" pInputText [(ngModel)]="containerNumber" (blur)="captureContainerNumber()">
+		</div>
+	</div>
+
+
+
+	<div class="form-line" >
+		<div class="form-label">
+			<p-radioButton name="selectSite" value="true" [(ngModel)]="chosenDefaultSite"></p-radioButton>
+			<label>Default Site:</label>
+		</div>
+		<div class="form-input" *ngIf="defaultSiteRetrievalSuccess">
+			<input type="text" pInputText [(ngModel)] = "defaultSite" (blur)="captureFacility()">
+		</div>
+		<div class="form-line" *ngIf="!defaultSiteRetrievalSuccess" [innerHTML]="defaultSiteRetrievalError">
+		</div>
+	</div>
+
+	
+
+
+	<div class="form-line">
+		<div class="form-label">
+			<p-radioButton name="selectSite" value="false" [(ngModel)]="chosenDefaultSite"></p-radioButton>
+			<label>Override Site:</label>
+		</div>
+		<div class="form-input">
+			<p-dropdown [options]="sites" [(ngModel)]="selectedSite" editable="editable" [style]="{'width':'202px'}"></p-dropdown>
+		</div>
+	</div>
+
+
+

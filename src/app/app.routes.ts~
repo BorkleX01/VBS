@@ -1,0 +1,27 @@
+import { LoginComponent } from './login/login.component';
+import { SimpleBookingsComponent } from './simple-bookings/simple-bookings.component';
+import { AppContainerComponent } from './app-container/app-container.component';
+import { AppAuthService } from './shared/app-auth.service';
+export const AppRoutes = [
+    {
+        path: '',
+        redirectTo: 'login',
+        pathMatch: 'full'
+    },
+    {
+        path: 'login',
+        component: LoginComponent,
+        name: 'Login'
+    },
+    {
+        path: 'home',
+        component: AppContainerComponent,
+        children: [{
+            path: '',
+            component: SimpleBookingsComponent
+        }],
+        canActivate: [AppAuthService]
+    }
+    
+    
+];
